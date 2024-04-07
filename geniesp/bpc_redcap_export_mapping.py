@@ -245,21 +245,21 @@ def get_drug_mapping(
     var_names = []
 
     # ! Not removing data dictionary code until 100% certain
-    # synid_file_dd = _get_synid_dd(syn, cohort, synid_table_prissmm)
+    synid_file_dd = _get_synid_dd(syn, cohort, synid_table_prissmm)
 
-    # dd = pd.read_csv(
-    #     syn.get(synid_file_dd).path, encoding="unicode_escape", low_memory=False
-    # )
-    grs = pd.read_csv(
-        syn.get(synid_file_grs).path, encoding="unicode_escape", low_memory=False
+    dd = pd.read_csv(
+        syn.get(synid_file_dd).path, encoding="unicode_escape", low_memory=False
     )
-    grs.columns = ["Variable / Field Name", "Choices, Calculations, OR Slider Labels"]
+    # grs = pd.read_csv(
+    #     syn.get(synid_file_grs).path, encoding="unicode_escape", low_memory=False
+    # )
+    # grs.columns = ["Variable / Field Name", "Choices, Calculations, OR Slider Labels"]
 
     for i in ["1", "2", "3", "4", "5"]:
         var_names.append("drugs_drug_" + i)
         var_names.append("drugs_drug_oth" + i)
 
-    for obj in [grs]:
+    for obj in [dd]:
         for var_name in var_names:
             if var_name in obj["Variable / Field Name"].unique():
                 choice_str = obj[obj["Variable / Field Name"] == var_name][
