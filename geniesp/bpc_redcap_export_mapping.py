@@ -496,7 +496,7 @@ def remap_pfs_values(df: pd.DataFrame):
     0 -> 0:CENSORED
     1 -> 1:PROGRESSED
     """
-    remap_values = {col: {0: "0:CENSORED", 1: "1:PROGRESSED"}
+    remap_values = {col: {0: "0:CENSORED", 1: "1: PROGRESSED OR DIED"}
                     for col in df.columns
                     if col.startswith('PFS') and col.endswith("STATUS")}
     return df.replace(remap_values)
