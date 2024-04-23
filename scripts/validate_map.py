@@ -119,6 +119,7 @@ def check_code_name_absent(
                     & (
                         (df["data_type"].str.lower() == "derived")
                         | (df["data_type"].str.lower() == "curated")
+                        | (df["data_type"].str.lower() == "tumor_registry")
                     )
                 )
             ]["code"]
@@ -195,7 +196,7 @@ def check_release_status_map_yes_sor_not(
     map_status = df[cohort]
     map_type = df["data_type"].str.lower()
     map_codes = df.loc[
-        ((map_status == True) & ((map_type == "derived") | (map_type == "curated")))
+        ((map_status == True) & ((map_type == "derived") | (map_type == "curated")| (map_type == "tumor_registry")))
     ]["code"]
 
     column_name = get_sor_column_name(
@@ -233,7 +234,7 @@ def check_release_status_sor_yes_map_not(
     map_status = df[cohort]
     map_type = df["data_type"].str.lower()
     map_codes = df.loc[
-        ((map_status == True) & ((map_type == "derived") | (map_type == "curated")))
+        ((map_status == True) & ((map_type == "derived") | (map_type == "curated") | (map_type == "tumor_registry")))
     ]["code"]
 
     column_name = get_sor_column_name(
@@ -275,7 +276,7 @@ def check_code_name_catalog(
     map_type = df["data_type"].str.lower()
     map_nonwild = ["*" not in code for code in df["code"]]
     map_codes = df.loc[
-        ((map_nonwild) & ((map_type == "derived") | (map_type == "curated")))
+        ((map_nonwild) & ((map_type == "derived") | (map_type == "curated") | (map_type == "tumor_registry")))
     ]["code"]
 
     res = set(map_codes) - set(table_var["variable"])
