@@ -496,7 +496,7 @@ def remap_pfs_values(df: pd.DataFrame):
     0 -> 0:CENSORED
     1 -> 1:PROGRESSED
     """
-    remap_values = {col: {0: "0:CENSORED", 1: "1:PROGRESSED"}
+    remap_values = {col: {0: "0:CENSORED", 1: "1:PROGRESSED OR DIED"}
                     for col in df.columns
                     if col.startswith('PFS') and col.endswith("STATUS")}
     return df.replace(remap_values)
@@ -517,7 +517,7 @@ class BpcProjectRunner(metaclass=ABCMeta):
     _SPONSORED_PROJECT = ""
     # Redcap codes to cbioportal mapping synid and form key is in
     # version 38, 42 were last stable version(s)
-    _REDCAP_TO_CBIOMAPPING_SYNID = "syn25712693.52"
+    _REDCAP_TO_CBIOMAPPING_SYNID = "syn25712693.53"
     # Run `git rev-parse HEAD` in Genie_processing directory to obtain shadigest
     _GITHUB_REPO = None
     # Mapping from Synapse Table to derived variables
