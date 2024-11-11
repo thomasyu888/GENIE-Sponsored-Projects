@@ -49,6 +49,17 @@ def main():
         type=str,
         help="Optional parameter to specify cbioportal folder location",
     )
+    parser.add_argument(
+        "--production",
+        action="store_true",
+        help="Use production project or not (staging). Default: false.",
+    )
+    parser.add_argument(
+        "--use-grs",
+        type=bool,
+        default=False,
+        help="Whether to use grs as primary mapping (dd as secondary) or not (using dd only).",
+    )
     args = parser.parse_args()
 
     numeric_level = getattr(logging, args.log.upper(), None)
@@ -63,7 +74,14 @@ def main():
     else:
         cbiopath = args.cbioportal
 
-    BPC_MAPPING[args.sp](syn, cbiopath, release=args.release, upload=args.upload).run()
+    BPC_MAPPING[args.sp](
+        syn, 
+        cbiopath, 
+        release=args.release, 
+        upload=args.upload, 
+        production = args.production, 
+        use_grs = args.use_grs
+    ).run()
 
 
 if __name__ == "__main__":

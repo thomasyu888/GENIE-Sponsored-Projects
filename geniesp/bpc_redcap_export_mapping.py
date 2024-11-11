@@ -14,7 +14,7 @@ import math
 import os
 import subprocess
 import logging
-from typing import List
+from typing import Dict, List
 
 from genie import create_case_lists, process_functions
 import numpy as np
@@ -223,10 +223,88 @@ def _get_synid_dd(syn: Synapse, cohort: str, synid_table_prissmm: str) -> str:
     return None
 
 
+def get_mapping_data(
+    syn : Synapse, 
+    synid_file_grs: str, 
+    synid_file_dd: str, 
+    use_grs : bool
+    ) -> pd.DataFrame:
+    """Reads in the global response set (grs) or data dictionary (dd) depending
+    on if we are using GRS or not
+
+    Args:
+        syn (Synapse): synapse client connection
+        synid_file_grs (str): synapse id of GRS
+        synid_file_dd (str): synapse id of data dictionary (dd)
+        use_grs (bool): Whether to use GRS or not
+
+    Returns:
+        pd.DataFrame: retrieved grs or dd data
+    """
+    if use_grs:
+        mapping = pd.read_csv(
+            syn.get(synid_file_grs).path, encoding="unicode_escape", low_memory=False
+        )
+    else:
+        mapping = pd.read_csv(
+            syn.get(synid_file_dd).path, encoding="unicode_escape", low_memory=False
+            )
+    return mapping
+
+
+def get_drug_variable_names() -> List[str]:
+    """Gets a list of drug names to parse in the map
+
+    Returns:
+        List[str]: list of drug names
+    """
+    var_names = []
+    for i in ["1", "2", "3", "4", "5"]:
+        var_names.append("drugs_drug_" + i)
+        var_names.append("drugs_drug_oth" + i)
+    return var_names
+
+
+def parse_drug_mappings(mapping: pd.DataFrame, var_names: List[str]) -> Dict[str, str]:
+    """Parses the mapping (grs or dd) data, and builds a reference map of
+        the mapping between drug names and their unique codes. 
+        Drug fields are parsed, and a list of drug names (labels) are extracted and
+        matched to their corresponding unique identifiers (NCIT drug code) which are also
+        extracted 
+
+    Args:
+        mapping (pd.DataFrame): the grs or dd mapping
+        var_names (List[str]): name of the drug fields to parse
+
+    Returns:
+        Dict[str, str]: map where keys are BPC drug short names and value is the
+                corresponding NCIT drug code
+    """
+    mappings = {}
+    # Rename columns for easier access
+    mapping.columns = ["Variable / Field Name", "Choices, Calculations, OR Slider Labels"]
+
+    for var_name in var_names:
+        if var_name in mapping["Variable / Field Name"].unique():
+            choice_str = mapping[mapping["Variable / Field Name"] == var_name][
+                "Choices, Calculations, OR Slider Labels"
+            ].values[0]
+            choice_str = choice_str.replace('"', "")
+
+            for pair in choice_str.split("|"):
+                if pair.strip() != "":
+                    code = pair.split(",")[0].strip()
+                    value = pair.split(",")[1].strip()
+                    label = value.split("(")[0].strip()
+                    mappings[label] = code
+                    
+    return mappings
+
+
 def get_drug_mapping(
-    syn: Synapse, cohort: str, synid_file_grs: str, synid_table_prissmm: str
-) -> dict:
-    """Get a mapping between drug short names and NCIT code from BPC data dictionary
+    syn: Synapse, cohort: str, synid_file_grs: str, synid_table_prissmm: str, use_grs : bool
+) -> Dict[str, str]:
+    """Gets a mapping between drug short names and NCIT code from BPC data dictionary
     and BPC global response set for a given BPC cohort.
     https://github.com/Sage-Bionetworks/GENIE-Sponsored-Projects/pull/24
 
@@ -235,50 +313,22 @@ def get_drug_mapping(
         cohort (str): cohort label
         synid_file_grs (str): Synapse ID of REDCap global response set file.
         synid_table_prissmm (str): Synapse ID of PRISSMM documentation table
+        use_grs (bool): Whether to use GRS or not
 
     Returns:
-        dict: map where keys are BPC drug short names and value is the
+        Dict[str, str]: map where keys are BPC drug short names and value is the
                 corresponding NCIT drug code
     """
-
-    mapping = {}
-    var_names = []
-
-    # ! Not removing data dictionary code until 100% certain
-    # synid_file_dd = _get_synid_dd(syn, cohort, synid_table_prissmm)
-
-    # dd = pd.read_csv(
-    #     syn.get(synid_file_dd).path, encoding="unicode_escape", low_memory=False
-    # )
-    grs = pd.read_csv(
-        syn.get(synid_file_grs).path, encoding="unicode_escape", low_memory=False
+    synid_file_dd = _get_synid_dd(syn, cohort, synid_table_prissmm)
+    mapping = get_mapping_data(
+        syn=syn, 
+        synid_file_grs=synid_file_grs,
+        synid_file_dd=synid_file_dd,
+        use_grs=use_grs
     )
-    grs.columns = ["Variable / Field Name", "Choices, Calculations, OR Slider Labels"]
-
-    for i in ["1", "2", "3", "4", "5"]:
-        var_names.append("drugs_drug_" + i)
-        var_names.append("drugs_drug_oth" + i)
-
-    for obj in [grs]:
-        for var_name in var_names:
-            if var_name in obj["Variable / Field Name"].unique():
-                choice_str = obj[obj["Variable / Field Name"] == var_name][
-                    "Choices, Calculations, OR Slider Labels"
-                ].values[0]
-                choice_str = choice_str.replace('"', "")
-
-                for pair in choice_str.split("|"):
-                    if pair.strip() != "":
-                        code = pair.split(",")[0].strip()
-                        value = pair.split(",")[1].strip()
-                        label = value.split("(")[0].strip()
-                        mapping[label] = code
-    # ! Remove this after DD and GRS is fixed
-    # mapping['Gemcitabine Hydrochloride'] = mapping['Gemcitabine HCL']
-    # mapping['Doxorubicin Hydrochloride'] = mapping['Doxorubicin HCL']
-    # mapping['Irinotecan Hydrochloride'] = mapping['Irinotecan HCL']
-    # mapping['Leucovorin Calcium'] = mapping['Leucovorin']
-    return mapping
+    var_names = get_drug_variable_names()
+    mappings = parse_drug_mappings(mapping=mapping, var_names=var_names)
+    return mappings
 
 
 def get_regimen_abbr(regimen: str, mapping: dict) -> str:
@@ -513,6 +563,10 @@ def _convert_to_int(value):
 class BpcProjectRunner(metaclass=ABCMeta):
     """BPC redcap to cbioportal export"""
 
+    _STAGING_RELEASES_FOLDER = {
+        "production:": "syn50876969",
+        "staging":"syn64018253"
+    }
     # Sponsored project name
     _SPONSORED_PROJECT = ""
     # Redcap codes to cbioportal mapping synid and form key is in
@@ -524,7 +578,10 @@ class BpcProjectRunner(metaclass=ABCMeta):
     # TODO: Make versioned
     _DATA_TABLE_IDS = "syn22296821"
     # Storage of not found samples
-    _SP_REDCAP_EXPORTS_SYNID = "syn21446571"
+    _SP_REDCAP_EXPORTS_SYNID = {
+        "production":"syn21446571",
+        "staging": "syn64018293"
+    }
     # main GENIE release folder (15.4-consortium)
     # Must use consortium release, because SEQ_YEAR is used
     _MG_RELEASE_SYNID = "syn53170398"
@@ -550,7 +607,7 @@ class BpcProjectRunner(metaclass=ABCMeta):
     # cohort-generic link to documentation for cBio files
     _url_cbio = "https://docs.google.com/document/d/1IBVF-FLecUG8Od6mSEhYfWH3wATLNMnZcBw2_G0jSAo/edit"
 
-    def __init__(self, syn, cbiopath, release, upload=False):
+    def __init__(self, syn, cbiopath, release, upload=False, production=False, use_grs=False):
         if not os.path.exists(cbiopath):
             raise ValueError("cbiopath doesn't exist")
         if self._SPONSORED_PROJECT == "":
@@ -560,6 +617,9 @@ class BpcProjectRunner(metaclass=ABCMeta):
         self.upload = upload
         self.release = release
         self._GITHUB_REPO = f"https://github.com/Sage-Bionetworks/GENIE-Sponsored-Projects/tree/{get_git_sha()}"
+        self.production = production
+        self.environment = "production" if self.production else "staging"
+        self.use_grs = use_grs
 
     @cached_property
     def genie_clinicaldf(self) -> pd.DataFrame:
@@ -642,9 +702,12 @@ class BpcProjectRunner(metaclass=ABCMeta):
         """Create case lists and release folder"""
         # parent_id = "syn50876969" if self.upload else "syn21241322"
         if self.upload:
-            parent_id = "syn50876969"
+            #parent_id = "syn50876969"
             sp_data_folder = self.syn.store(
-                Folder(self._SPONSORED_PROJECT, parentId=parent_id)
+                Folder(
+                    self._SPONSORED_PROJECT, 
+                    parentId=self._STAGING_RELEASES_FOLDER[self.environment]
+                )
             )
             release_folder = self.syn.store(Folder(self.release, parent=sp_data_folder))
             # Store in cBioPortal files because there is another folder for
@@ -1645,6 +1708,7 @@ class BpcProjectRunner(metaclass=ABCMeta):
             cohort=self._SPONSORED_PROJECT,
             synid_file_grs=self._GRS_SYNID,
             synid_table_prissmm=self._PRISSMM_SYNID,
+            use_grs=self.use_grs,
         )
         regimens_data = create_regimens(
             self.syn,
@@ -1871,7 +1935,8 @@ class BpcProjectRunner(metaclass=ABCMeta):
                 if self.upload:
                     self.syn.store(
                         File(
-                            "notfoundsamples.csv", parent=self._SP_REDCAP_EXPORTS_SYNID
+                            "notfoundsamples.csv", 
+                            parent=self._SP_REDCAP_EXPORTS_SYNID[self.environment]
                         )
                     )
         # Hard coded most up to date oncotree version
