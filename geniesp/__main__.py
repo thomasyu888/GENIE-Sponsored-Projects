@@ -49,6 +49,11 @@ def main():
         type=str,
         help="Optional parameter to specify cbioportal folder location",
     )
+    parser.add_argument(
+        "--production",
+        action="store_true",
+        help="Use production project or not (staging). Default: false.",
+    )
     args = parser.parse_args()
 
     numeric_level = getattr(logging, args.log.upper(), None)
@@ -63,7 +68,13 @@ def main():
     else:
         cbiopath = args.cbioportal
 
-    BPC_MAPPING[args.sp](syn, cbiopath, release=args.release, upload=args.upload).run()
+    BPC_MAPPING[args.sp](
+        syn,
+        cbiopath,
+        release=args.release,
+        upload=args.upload,
+        production = args.production
+    ).run()
 
 
 if __name__ == "__main__":
