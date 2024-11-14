@@ -534,7 +534,7 @@ class BpcProjectRunner(metaclass=ABCMeta):
     }
     # main GENIE release folder (15.4-consortium)
     # Must use consortium release, because SEQ_YEAR is used
-    _MG_RELEASE_SYNID = "syn53170398"
+    _MG_RELEASE_SYNID = "syn63602196"
     # PRISSMM documentation table
     _PRISSMM_SYNID = "syn22684834"
     # REDCap global response set
