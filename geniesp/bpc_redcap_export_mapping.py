@@ -512,7 +512,11 @@ def _convert_to_int(value):
 
 class BpcProjectRunner(metaclass=ABCMeta):
     """BPC redcap to cbioportal export"""
-
+    
+    _STAGING_RELEASES_FOLDER = {
+        "production:": "syn50876969",
+        "staging":"syn64018253"
+    }
     # Sponsored project name
     _SPONSORED_PROJECT = ""
     # Redcap codes to cbioportal mapping synid and form key is in
@@ -524,7 +528,10 @@ class BpcProjectRunner(metaclass=ABCMeta):
     # TODO: Make versioned
     _DATA_TABLE_IDS = "syn22296821"
     # Storage of not found samples
-    _SP_REDCAP_EXPORTS_SYNID = "syn21446571"
+    _SP_REDCAP_EXPORTS_SYNID = {
+        "production":"syn21446571",
+        "staging": "syn64018293"
+    }
     # main GENIE release folder (15.4-consortium)
     # Must use consortium release, because SEQ_YEAR is used
     _MG_RELEASE_SYNID = "syn53170398"
@@ -550,7 +557,7 @@ class BpcProjectRunner(metaclass=ABCMeta):
     # cohort-generic link to documentation for cBio files
     _url_cbio = "https://docs.google.com/document/d/1IBVF-FLecUG8Od6mSEhYfWH3wATLNMnZcBw2_G0jSAo/edit"
 
-    def __init__(self, syn, cbiopath, release, upload=False):
+    def __init__(self, syn, cbiopath, release, upload=False, production=False):
         if not os.path.exists(cbiopath):
             raise ValueError("cbiopath doesn't exist")
         if self._SPONSORED_PROJECT == "":
@@ -560,6 +567,8 @@ class BpcProjectRunner(metaclass=ABCMeta):
         self.upload = upload
         self.release = release
         self._GITHUB_REPO = f"https://github.com/Sage-Bionetworks/GENIE-Sponsored-Projects/tree/{get_git_sha()}"
+        self.production = production
+        self.environment = "production" if self.production else "staging"
 
     @cached_property
     def genie_clinicaldf(self) -> pd.DataFrame:
@@ -641,10 +650,13 @@ class BpcProjectRunner(metaclass=ABCMeta):
     def cbioportal_folders(self) -> dict:
         """Create case lists and release folder"""
         # parent_id = "syn50876969" if self.upload else "syn21241322"
+        print(self.environment)
         if self.upload:
-            parent_id = "syn50876969"
             sp_data_folder = self.syn.store(
-                Folder(self._SPONSORED_PROJECT, parentId=parent_id)
+                Folder(
+                    self._SPONSORED_PROJECT,
+                    parentId=self._STAGING_RELEASES_FOLDER[self.environment]
+                )
             )
             release_folder = self.syn.store(Folder(self.release, parent=sp_data_folder))
             # Store in cBioPortal files because there is another folder for
@@ -1871,7 +1883,8 @@ class BpcProjectRunner(metaclass=ABCMeta):
                 if self.upload:
                     self.syn.store(
                         File(
-                            "notfoundsamples.csv", parent=self._SP_REDCAP_EXPORTS_SYNID
+                            "notfoundsamples.csv",
+                            parent=self._SP_REDCAP_EXPORTS_SYNID[self.environment]
                         )
                     )
         # Hard coded most up to date oncotree version
