@@ -4,6 +4,5 @@ WORKDIR /usr/src/GENIE-Sponsored-Projects
 
 COPY . .
 RUN pip install ./
-RUN pip install -r requirements.txt
 
 RUN git clone https://github.com/cBioPortal/cbioportal.git -b v5.3.19 ../cbioportal
