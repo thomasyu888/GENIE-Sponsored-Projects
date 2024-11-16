@@ -59,17 +59,21 @@ optional arguments:
   --cbioportal {synapseID}
                         Optional parameter to specify cbioportal folder
                         location
+  --production          Whether to run in production mode or not. Default: false
 ```
 
 Example command line:
 
+This runs the release pipeline for BLADDER 1.1 in non-production mode (staging).
+
 ```
-geniesp BLADDER 1.1-consortium
 geniesp BLADDER 1.1-consortium --upload
 ```
 
+Example command using docker:
+
+This runs the release pipeline for PANC 1.1 in non-production mode (staging).
 ```
-docker run --rm -e SYNAPSE_AUTH_TOKEN=$SYNAPSE_AUTH_TOKEN geniesp geniesp PANC 1.1-consortium
 docker run --rm -e SYNAPSE_AUTH_TOKEN=$SYNAPSE_AUTH_TOKEN geniesp geniesp PANC 1.1-consortium --upload
 ```
 

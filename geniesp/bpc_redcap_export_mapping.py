@@ -562,7 +562,7 @@ def _convert_to_int(value):
 
 class BpcProjectRunner(metaclass=ABCMeta):
     """BPC redcap to cbioportal export"""
-
+    
     _STAGING_RELEASES_FOLDER = {
         "production:": "syn50876969",
         "staging":"syn64018253"
@@ -701,11 +701,11 @@ class BpcProjectRunner(metaclass=ABCMeta):
     def cbioportal_folders(self) -> dict:
         """Create case lists and release folder"""
         # parent_id = "syn50876969" if self.upload else "syn21241322"
+        print(self.environment)
         if self.upload:
-            #parent_id = "syn50876969"
             sp_data_folder = self.syn.store(
                 Folder(
-                    self._SPONSORED_PROJECT, 
+                    self._SPONSORED_PROJECT,
                     parentId=self._STAGING_RELEASES_FOLDER[self.environment]
                 )
             )
@@ -1935,7 +1935,7 @@ class BpcProjectRunner(metaclass=ABCMeta):
                 if self.upload:
                     self.syn.store(
                         File(
-                            "notfoundsamples.csv", 
+                            "notfoundsamples.csv",
                             parent=self._SP_REDCAP_EXPORTS_SYNID[self.environment]
                         )
                     )

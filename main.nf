@@ -11,7 +11,6 @@ process cBioPortalExport {
    input:
    val cohort
    val release
-   val upload
    val production
    val use_grs
 
@@ -40,7 +39,6 @@ process cBioPortalExport {
 workflow {
    params.cohort = 'NSCLC' // Default
    params.release = '1.1-consortium'  // Default
-   params.upload = false  // Default
    params.production = false
    params.use_grs = false
 
@@ -50,9 +48,8 @@ workflow {
 
    ch_cohort = Channel.value(params.cohort)
    ch_release = Channel.value(params.release)
-   ch_upload = Channel.value(params.upload)
    ch_production = Channel.value(params.production)
    ch_use_grs = Channel.value(params.use_grs)
 
-   cBioPortalExport(ch_cohort, ch_release, ch_upload, ch_production, ch_use_grs)
+   cBioPortalExport(ch_cohort, ch_release, ch_production, ch_use_grs)
 }
