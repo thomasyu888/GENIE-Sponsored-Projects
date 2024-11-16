@@ -1733,7 +1733,7 @@ class BpcProjectRunner(metaclass=ABCMeta):
         return {"df": subset_survivaldf[cols_to_order], "survival_info": survival_info}
 
     def get_survival_treatment(
-        self, df_map: pd.DataFrame, df_file: pd.DataFrame
+        self, df_map: pd.DataFrame, df_file: pd.DataFrame,
     ) -> pd.DataFrame:
         """Get SURVIVAL and REGIMEN file data.
 
@@ -1755,6 +1755,7 @@ class BpcProjectRunner(metaclass=ABCMeta):
             cohort=self._SPONSORED_PROJECT,
             synid_file_grs=self._GRS_SYNID,
             synid_table_prissmm=self._PRISSMM_SYNID,
+            use_grs=self.use_grs,
         )
         regimens_data = create_regimens(
             self.syn,
@@ -2163,7 +2164,7 @@ class BpcProjectRunner(metaclass=ABCMeta):
 
         logging.info("writing CLINICAL-SURVIVAL-TREATMENT...")
         df_survival_treatment = self.get_survival_treatment(
-            df_map=redcap_to_cbiomappingdf, df_file=data_tablesdf
+            df_map=redcap_to_cbiomappingdf, df_file=data_tablesdf,
         )
         surv_treatment_path = self.write_clinical_file(
             df_survival_treatment,
