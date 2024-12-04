@@ -534,10 +534,10 @@ class BpcProjectRunner(metaclass=ABCMeta):
         "staging": "syn64018293"
     }
     # main GENIE release folder
-    # Must use consortium release, because SEQ_YEAR is used
+    # NOTE: Must use consortium release, because SEQ_YEAR is used
     # NOTE: Must match release tracking sheet and release table info
     # for the given cohort
-    _MG_RELEASE_SYNID = "syn63602657"
+    _MG_RELEASE_SYNID = "syn63602196"
     # PRISSMM documentation table
     _PRISSMM_SYNID = "syn22684834"
     # REDCap global response set
