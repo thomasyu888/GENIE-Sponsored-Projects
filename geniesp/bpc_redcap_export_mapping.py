@@ -514,7 +514,7 @@ class BpcProjectRunner(metaclass=ABCMeta):
     """BPC redcap to cbioportal export"""
     
     _STAGING_RELEASES_FOLDER = {
-        "production:": "syn50876969",
+        "production": "syn50876969",
         "staging":"syn64018253"
     }
     # Sponsored project name
