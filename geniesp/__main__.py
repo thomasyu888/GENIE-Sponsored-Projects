@@ -56,9 +56,8 @@ def main():
     )
     parser.add_argument(
         "--use-grs",
-        type=bool,
-        default=False,
-        help="Whether to use grs as primary mapping (dd as secondary) or not (using dd only).",
+        action="store_true",
+        help="Whether to use grs or use dd as primary mapping.",
     )
     args = parser.parse_args()
 
@@ -75,7 +74,7 @@ def main():
         cbiopath = args.cbioportal
 
     BPC_MAPPING[args.sp](
-        syn, 
+        syn,
         cbiopath, 
         release=args.release, 
         upload=args.upload, 

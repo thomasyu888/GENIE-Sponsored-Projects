@@ -18,20 +18,33 @@ process cBioPortalExport {
    stdout
 
    script:
-   if (production) {
+   if (production && use_grs) {
       """
       geniesp $cohort $release \
          --upload \
          --cbioportal /usr/src/cbioportal \
          --production \
-         --use_grs $use_grs
+         --use-grs
+      """
+   } else if (production && !use_grs){
+      """
+      geniesp $cohort $release \
+         --upload \
+         --cbioportal /usr/src/cbioportal \
+         --production
+      """
+   } else if (!production && use_grs){
+      """
+      geniesp $cohort $release \
+         --upload \
+         --cbioportal /usr/src/cbioportal \
+         --use-grs
       """
    } else {
       """
       geniesp $cohort $release \
          --upload \
          --cbioportal /usr/src/cbioportal \
-         --use_grs $use_grs
       """
    }
 }

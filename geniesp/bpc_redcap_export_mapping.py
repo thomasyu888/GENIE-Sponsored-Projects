@@ -282,7 +282,13 @@ def parse_drug_mappings(mapping: pd.DataFrame, var_names: List[str]) -> Dict[str
     """
     mappings = {}
     # Rename columns for easier access
-    mapping.columns = ["Variable / Field Name", "Choices, Calculations, OR Slider Labels"]
+    mapping = mapping.rename(
+        columns={
+            mapping.columns[0]: "Variable / Field Name", 
+            mapping.columns[1]: "Choices, Calculations, OR Slider Labels"
+            }
+        )
+    mapping = mapping[["Variable / Field Name", "Choices, Calculations, OR Slider Labels"]]
 
     for var_name in var_names:
         if var_name in mapping["Variable / Field Name"].unique():

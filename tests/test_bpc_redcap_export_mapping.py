@@ -72,8 +72,8 @@ def test_get_mapping_data_calls_dd_if_use_grs_is_false(mock_syn):
         (
             pd.DataFrame(
                 {
-                    "variable": ["drugs_drug_1"],
-                    "labels": ["D001, Aspirin | D002, Ibuprofen | D003, Paracetamol"],
+                    "Variable / Field Name": ["drugs_drug_1"],
+                    "Choices, Calculations, OR Slider Labels": ["D001, Aspirin | D002, Ibuprofen | D003, Paracetamol"],
                 }
             ),
             ["drugs_drug_1"],
@@ -83,7 +83,7 @@ def test_get_mapping_data_calls_dd_if_use_grs_is_false(mock_syn):
             pd.DataFrame(
                 {
                     "variable": ["drugs_drug_1"],
-                    "labels": ["D001, Aspirin|"],
+                    "choices": ["D001, Aspirin|"],
                 }
             ),
             ["drugs_drug_1"],
@@ -93,7 +93,7 @@ def test_get_mapping_data_calls_dd_if_use_grs_is_false(mock_syn):
             pd.DataFrame(
                 {
                     "variable": ["ethnicity"],
-                    "labels": ["1"],
+                    "choices": ["1"],
                 }
             ),
             ["drugs_drug_1"],
@@ -102,10 +102,11 @@ def test_get_mapping_data_calls_dd_if_use_grs_is_false(mock_syn):
         (
             pd.DataFrame(
                 {
-                    "variable": ["drugs_drug_1"],
-                    "labels": [
+                    "Variable / Field Name": ["drugs_drug_1"],
+                    "Choices, Calculations, OR Slider Labels": [
                         "D001, Aspirin (alternative) | D002, Ibuprofen | D003, Paracetamol"
                     ],
+                    "extra_column" : ["test1", "test2"]
                 }
             ),
             ["drugs_drug_1"],
