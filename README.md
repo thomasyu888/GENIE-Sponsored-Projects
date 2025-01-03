@@ -60,14 +60,15 @@ optional arguments:
                         Optional parameter to specify cbioportal folder
                         location
   --production          Whether to run in production mode or not. Default: false
+  --use-grs             Whether to use grs or use dd as primary mapping. Default: false
 ```
 
 Example command line:
 
-This runs the release pipeline for BLADDER 1.1 in non-production mode (staging).
+This runs the release pipeline for BLADDER 1.1 in non-production mode (staging) with GRS enabled.
 
 ```
-geniesp BLADDER 1.1-consortium --upload
+geniesp BLADDER 1.1-consortium --upload --use-grs
 ```
 
 Example command using docker:
