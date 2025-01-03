@@ -82,8 +82,8 @@ def test_get_mapping_data_calls_dd_if_use_grs_is_false(mock_syn):
         (
             pd.DataFrame(
                 {
-                    "variable": ["drugs_drug_1"],
-                    "choices": ["D001, Aspirin|"],
+                    "Variable / Field Name": ["drugs_drug_1"],
+                    "Choices, Calculations, OR Slider Labels": ["D001, Aspirin|"],
                 }
             ),
             ["drugs_drug_1"],
@@ -92,8 +92,8 @@ def test_get_mapping_data_calls_dd_if_use_grs_is_false(mock_syn):
         (
             pd.DataFrame(
                 {
-                    "variable": ["ethnicity"],
-                    "choices": ["1"],
+                    "Variable / Field Name": ["ethnicity"],
+                    "Choices, Calculations, OR Slider Labels": ["1"],
                 }
             ),
             ["drugs_drug_1"],

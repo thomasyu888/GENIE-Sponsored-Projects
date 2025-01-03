@@ -281,13 +281,8 @@ def parse_drug_mappings(mapping: pd.DataFrame, var_names: List[str]) -> Dict[str
                 corresponding NCIT drug code
     """
     mappings = {}
-    # Rename columns for easier access
-    mapping = mapping.rename(
-        columns={
-            mapping.columns[0]: "Variable / Field Name", 
-            mapping.columns[1]: "Choices, Calculations, OR Slider Labels"
-            }
-        )
+    # dd has more than 2 columns and not all columns start with these two.
+    # going to just subset to the required columns.
     mapping = mapping[["Variable / Field Name", "Choices, Calculations, OR Slider Labels"]]
 
     for var_name in var_names:
