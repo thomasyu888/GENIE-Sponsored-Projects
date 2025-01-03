@@ -106,7 +106,7 @@ def test_get_mapping_data_calls_dd_if_use_grs_is_false(mock_syn):
                     "Choices, Calculations, OR Slider Labels": [
                         "D001, Aspirin (alternative) | D002, Ibuprofen | D003, Paracetamol"
                     ],
-                    "extra_column" : ["test1", "test2"]
+                    "extra_column" : ["test1"]
                 }
             ),
             ["drugs_drug_1"],
