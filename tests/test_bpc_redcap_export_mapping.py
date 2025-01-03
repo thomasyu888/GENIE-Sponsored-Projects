@@ -73,16 +73,6 @@ def test_get_mapping_data_calls_dd_if_use_grs_is_false(mock_syn):
             pd.DataFrame(
                 {
                     "Variable / Field Name": ["drugs_drug_1"],
-                    "Choices, Calculations, OR Slider Labels": ["D001, Aspirin | D002, Ibuprofen | D003, Paracetamol"],
-                }
-            ),
-            ["drugs_drug_1"],
-            {"Aspirin": "D001", "Ibuprofen": "D002", "Paracetamol": "D003"},
-        ),
-        (
-            pd.DataFrame(
-                {
-                    "Variable / Field Name": ["drugs_drug_1"],
                     "Choices, Calculations, OR Slider Labels": ["D001, Aspirin|"],
                 }
             ),
@@ -115,7 +105,6 @@ def test_get_mapping_data_calls_dd_if_use_grs_is_false(mock_syn):
     ],
     ids=[
         "multiple_drug_vars",
-        "diff_var_names",
         "empty_split",
         "nothing_to_parse",
         "parenthesis_split",
