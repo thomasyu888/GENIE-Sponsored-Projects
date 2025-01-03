@@ -11,25 +11,40 @@ process cBioPortalExport {
    input:
    val cohort
    val release
-   val upload
    val production
+   val use_grs
 
    output:
    stdout
 
    script:
-   if (production) {
+   if (production && use_grs) {
+      """
+      geniesp $cohort $release \
+         --upload \
+         --cbioportal /usr/src/cbioportal \
+         --production \
+         --use-grs
+      """
+   } else if (production && !use_grs){
       """
       geniesp $cohort $release \
          --upload \
          --cbioportal /usr/src/cbioportal \
          --production
       """
+   } else if (!production && use_grs){
+      """
+      geniesp $cohort $release \
+         --upload \
+         --cbioportal /usr/src/cbioportal \
+         --use-grs
+      """
    } else {
       """
       geniesp $cohort $release \
          --upload \
-         --cbioportal /usr/src/cbioportal
+         --cbioportal /usr/src/cbioportal \
       """
    }
 }
@@ -37,8 +52,8 @@ process cBioPortalExport {
 workflow {
    params.cohort = 'NSCLC' // Default
    params.release = '1.1-consortium'  // Default
-   params.upload = false  // Default
    params.production = false
+   params.use_grs = false
 
    // Check if cohort is part of allowed cohort list
    def allowed_cohorts = ["BLADDER", "BrCa", "CRC", "NSCLC", "PANC", "Prostate"]
@@ -46,8 +61,8 @@ workflow {
 
    ch_cohort = Channel.value(params.cohort)
    ch_release = Channel.value(params.release)
-   ch_upload = Channel.value(params.upload)
    ch_production = Channel.value(params.production)
+   ch_use_grs = Channel.value(params.use_grs)
 
-   cBioPortalExport(ch_cohort, ch_release, ch_upload, ch_production)
+   cBioPortalExport(ch_cohort, ch_release, ch_production, ch_use_grs)
 }

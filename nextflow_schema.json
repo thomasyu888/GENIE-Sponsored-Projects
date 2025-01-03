@@ -44,6 +44,15 @@
                         false
                     ]
                 },
+                "use_grs": {
+                    "type": "boolean",
+                    "description": "Whether to use grs as primary mapping (dd as secondary) or not (using dd only). ",
+                    "default": false,
+                    "enum": [
+                        true,
+                        false
+                    ]
+                },
                 "help": {
                     "type": "boolean",
                     "description": "Display input options and descriptions",

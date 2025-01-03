@@ -54,6 +54,11 @@ def main():
         action="store_true",
         help="Use production project or not (staging). Default: false.",
     )
+    parser.add_argument(
+        "--use-grs",
+        action="store_true",
+        help="Whether to use grs or use dd as primary mapping.",
+    )
     args = parser.parse_args()
 
     numeric_level = getattr(logging, args.log.upper(), None)
@@ -70,10 +75,11 @@ def main():
 
     BPC_MAPPING[args.sp](
         syn,
-        cbiopath,
-        release=args.release,
-        upload=args.upload,
-        production = args.production
+        cbiopath, 
+        release=args.release, 
+        upload=args.upload, 
+        production = args.production, 
+        use_grs = args.use_grs
     ).run()
 
 
