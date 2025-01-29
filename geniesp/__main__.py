@@ -1,10 +1,22 @@
 """GENIE SP/BPC cBioPortal exporter CLI"""
+
 import argparse
 import logging
 
 import synapseclient
 
-from .bpc_config import Brca, Crc, Nsclc, Panc, Prostate, Bladder
+from .bpc_config import (
+    Brca,
+    Crc,
+    Nsclc,
+    Panc,
+    Prostate,
+    Bladder,
+    Renal,
+    Ovarian,
+    Melanoma,
+    Esophago,
+)
 from .sp_config import Akt1, Erbb2, Fgfr4
 
 BPC_MAPPING = {
@@ -17,6 +29,10 @@ BPC_MAPPING = {
     "AKT1": Akt1,
     "ERRB2": Erbb2,
     "FGFR4": Fgfr4,
+    "RENAL": Renal,
+    "OVARIAN": Ovarian,
+    "MELANOMA": Melanoma,
+    "ESOPHAGO": Esophago,
 }
 
 
@@ -75,11 +91,11 @@ def main():
 
     BPC_MAPPING[args.sp](
         syn,
-        cbiopath, 
-        release=args.release, 
-        upload=args.upload, 
-        production = args.production, 
-        use_grs = args.use_grs
+        cbiopath,
+        release=args.release,
+        upload=args.upload,
+        production=args.production,
+        use_grs=args.use_grs,
     ).run()
 
 
