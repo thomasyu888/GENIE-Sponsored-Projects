@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_references_docker:
+  build_docker:
     runs-on: ubuntu-latest
     env:
       REGISTRY: ghcr.io
