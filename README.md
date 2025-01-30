@@ -44,12 +44,12 @@ Output will be as follows
 
 ```
 usage: geniesp [-h] [--staging]
-               {NSCLC,CRC,BrCa,PANC,Prostate,AKT1,ERRB2,FGFR4} release
+               {NSCLC,CRC,BrCa,PANC,Prostate,AKT1,ERRB2,FGFR4,ESOPHAGO,MELANOMA,OVARIAN,RENAL} release
 
 Run GENIE sponsored projects
 
 positional arguments:
-  {NSCLC,CRC,BrCa,PANC,Prostate,AKT1,ERRB2,FGFR4}
+  {NSCLC,CRC,BrCa,PANC,Prostate,AKT1,ERRB2,FGFR4,ESOPHAGO,MELANOMA,OVARIAN,RENAL}
                         Specify project to run
   release               Specify bpc release (e.g. 1.1-consortium)
 
@@ -97,7 +97,7 @@ python validate_map.py -h
 
 which outputs:
 ```
-usage: validate_map.py [-h] [--synapse_id SYNAPSE_ID | --file FILE] [--version VERSION] [--cohort {BLADDER,BRCA,CRC,NSCLC,PANC,PROSTATE}]
+usage: validate_map.py [-h] [--synapse_id SYNAPSE_ID | --file FILE] [--version VERSION] [--cohort COHORT]
                        [--release {1.1-consortium,1.2-consortium,2.0-public,2.1-consortium}] [--outfile OUTFILE] [--log {debug,info,warning,error}]
 
 Checks validity of BPC to cBioPortal mapping file
@@ -109,7 +109,7 @@ optional arguments:
   --file FILE, -f FILE  Local path to mapping file
   --version VERSION, -v VERSION
                         Synapse entity version number (default: current)
-  --cohort {BLADDER,BRCA,CRC,NSCLC,PANC,PROSTATE}, -c {BLADDER,BRCA,CRC,NSCLC,PANC,PROSTATE}
+  --cohort COHORT, -c COHORT
                         BPC cohort label (default: BLADDER)
   --release {1.1-consortium,1.2-consortium,2.0-public,2.1-consortium}, -r {1.1-consortium,1.2-consortium,2.0-public,2.1-consortium}
                         Release label (default: 1.1-consortium)
