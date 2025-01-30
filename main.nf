@@ -5,7 +5,7 @@ nextflow.enable.dsl=2
 Run cBioPortal Export
 */
 process cBioPortalExport {
-   container 'sagebionetworks/geniesp'
+   container "$params.geniesp_docker"
    secret 'SYNAPSE_AUTH_TOKEN'
 
    input:
