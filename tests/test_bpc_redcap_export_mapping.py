@@ -115,7 +115,7 @@ def test_that_parse_drug_mappings(input_mapping, var_names, output_mapping):
     assert result == output_mapping
 
 
-pytest.mark.parametrize(
+@pytest.mark.parametrize(
     "input_mapping, output_mapping",
     [
         (
