@@ -46,6 +46,12 @@ CBIO_FILEFORMATS_ALL = [
     "data_CNA.txt",
 ]
 
+ONCOTREE_CODE_TO_COHORT_MAP = {
+    "RCC": "RENAL",
+    "OVARY": "OVARIAN",
+    "MEL": "MELANOMA",
+    "EGC": "ESOPHAGO"
+}
 
 def get_file_data(
     syn: Synapse, mappingdf: pd.DataFrame, sampletype: str, cohort: str = "NSCLC"
@@ -560,6 +566,20 @@ def _convert_to_int(value):
     except ValueError:
         return float('nan')
 
+
+def map_oncotree_codes_to_cohort_name(oncotree_dict : dict) -> dict:
+    """Maps oncotree codes for certain codes
+
+    Args:
+        oncotree_dict (dict): oncotree code mappings
+
+    Returns:
+        dict: remapped oncotree codes
+    """
+    remapped_oncotree_dict = {
+        ONCOTREE_CODE_TO_COHORT_MAP.get(code.upper(), code): val for code, val in oncotree_dict.items()
+    }
+    return remapped_oncotree_dict
 
 class BpcProjectRunner(metaclass=ABCMeta):
     """BPC redcap to cbioportal export"""
@@ -1901,7 +1921,7 @@ class BpcProjectRunner(metaclass=ABCMeta):
         df_sample_subset.drop_duplicates("SAMPLE_ID", inplace=True)
 
         return df_sample_subset
-
+    
     def create_and_write_case_lists(
         self, subset_sampledf: pd.DataFrame, subset_patientdf: pd.DataFrame, used: list
     ) -> None:
@@ -1952,22 +1972,24 @@ class BpcProjectRunner(metaclass=ABCMeta):
             "http://oncotree.mskcc.org/api/tumorTypes/tree?version=oncotree_2018_06_01"
         )
         oncotree_dict = process_functions.get_oncotree_code_mappings(oncotreelink)
+        remapped_oncotree_dict = map_oncotree_codes_to_cohort_name(oncotree_dict)
+        
         # Map cancer type and cancer type detailed
         # This is to create case list files
         merged_clinicaldf["CANCER_TYPE"] = [
-            oncotree_dict[code.upper()].get("CANCER_TYPE", float("nan"))
+            remapped_oncotree_dict[code.upper()].get("CANCER_TYPE", float("nan"))
             for code in merged_clinicaldf["ONCOTREE_CODE"]
         ]
         merged_clinicaldf["CANCER_TYPE_DETAILED"] = [
-            oncotree_dict[code.upper()].get("CANCER_TYPE_DETAILED", float("nan"))
+            remapped_oncotree_dict[code.upper()].get("CANCER_TYPE_DETAILED", float("nan"))
             for code in merged_clinicaldf["ONCOTREE_CODE"]
         ]
         merged_clinicaldf["ONCOTREE_PRIMARY_NODE"] = [
-            oncotree_dict[code.upper()].get("ONCOTREE_PRIMARY_NODE", float("nan"))
+            remapped_oncotree_dict[code.upper()].get("ONCOTREE_PRIMARY_NODE", float("nan"))
             for code in merged_clinicaldf["ONCOTREE_CODE"]
         ]
         merged_clinicaldf["ONCOTREE_SECONDARY_NODE"] = [
-            oncotree_dict[code.upper()].get("ONCOTREE_SECONDARY_NODE", float("nan"))
+            remapped_oncotree_dict[code.upper()].get("ONCOTREE_SECONDARY_NODE", float("nan"))
             for code in merged_clinicaldf["ONCOTREE_CODE"]
         ]
         # Remove duplicated sample ids (there shouldn't be any)
