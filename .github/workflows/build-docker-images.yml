@@ -3,9 +3,8 @@ name: Build and Push Docker Images
 on:
   push:
     branches: [develop, 'GEN*', 'gen*']
-    paths:
-      - 'geniesp/**'
-      - '.github/workflows/build-docker-images.yml'
+    paths-ignore:
+        - '**.md'
   workflow_dispatch:
 
 jobs:
