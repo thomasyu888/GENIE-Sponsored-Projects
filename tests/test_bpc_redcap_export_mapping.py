@@ -214,8 +214,6 @@ pytest.mark.parametrize(
         "diff_code_casing",
     ],
 )
-
-
 def test_that_map_oncotree_codes_to_cohort_name_returns_expected_remapped_values(
     input_mapping, output_mapping
 ):
