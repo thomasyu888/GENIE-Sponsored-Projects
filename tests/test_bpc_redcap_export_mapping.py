@@ -1,3 +1,4 @@
+import logging
 import pytest
 from unittest import mock
 
@@ -5,6 +6,8 @@ import pandas as pd
 import synapseclient
 
 from geniesp import bpc_redcap_export_mapping as bpc_export
+
+LOGGER = logging.getLogger(__name__)
 
 
 @pytest.fixture
@@ -115,107 +118,53 @@ def test_that_parse_drug_mappings(input_mapping, var_names, output_mapping):
     assert result == output_mapping
 
 
-@pytest.mark.parametrize(
-    "input_mapping, output_mapping",
+@pytest.mark.parameterize(
+    "input_data, oncotree_dict, expected_warning",
     [
         (
+            pd.DataFrame(
+                dict(
+                    ONCOTREE_CODE=["Renal Cell Carcinoma", "Renal Clear Cell Carcinoma"]
+                )
+            ),
             {
-                "RCC": {
-                    "CANCER_TYPE": "Renal cancer",
-                    "CANCER_TYPE_DETAILED": "Renal cancer detailed",
-                },
-                "OVARY": {
-                    "CANCER_TYPE": "Ovarian Cancer",
-                    "CANCER_TYPE_DETAILED": "Ovarian cancer detailed",
-                },
+                "RCC": {"CANCER_TYPE": "Renal Cell Carcinoma"},
+                "OVARY": {"CANCER_TYPE": "Ovarian Cancer"},
             },
-            {
-                "RENAL": {
-                    "CANCER_TYPE": "Renal cancer",
-                    "CANCER_TYPE_DETAILED": "Renal cancer detailed",
-                },
-                "OVARIAN": {
-                    "CANCER_TYPE": "Ovarian Cancer",
-                    "CANCER_TYPE_DETAILED": "Ovarian cancer detailed",
-                },
-            },
+            "There are invalid values in ONCOTREE_CODE column in the clinical df. They are: ['Renal Cell Carcinoma', 'Renal Clear Cell Carcinoma']",
         ),
         (
+            pd.DataFrame(dict(ONCOTREE_CODE=["Renal Cell Carcinoma", "RCC"])),
             {
-                "BONE": {
-                    "CANCER_TYPE": "Bone Cancer",
-                    "CANCER_TYPE_DETAILED": "Bone cancer detailed",
-                },
-                "BRAIN": {
-                    "CANCER_TYPE": "Brain Cancer",
-                    "CANCER_TYPE_DETAILED": "Brain cancer detailed",
-                },
+                "RCC": {"CANCER_TYPE": "Renal Cell Carcinoma"},
+                "OVARY": {"CANCER_TYPE": "Ovarian Cancer"},
             },
-            {
-                "BONE": {
-                    "CANCER_TYPE": "Bone Cancer",
-                    "CANCER_TYPE_DETAILED": "Bone cancer detailed",
-                },
-                "BRAIN": {
-                    "CANCER_TYPE": "Brain Cancer",
-                    "CANCER_TYPE_DETAILED": "Brain cancer detailed",
-                },
-            },
-        ),
-        (
-            {
-                "RCC": {
-                    "CANCER_TYPE": "Renal cancer",
-                    "CANCER_TYPE_DETAILED": "Renal cancer detailed",
-                },
-                "BONE": {
-                    "CANCER_TYPE": "Bone Cancer",
-                    "CANCER_TYPE_DETAILED": "Bone cancer detailed",
-                },
-            },
-            {
-                "RENAL": {
-                    "CANCER_TYPE": "Renal cancer",
-                    "CANCER_TYPE_DETAILED": "Renal cancer detailed",
-                },
-                "BONE": {
-                    "CANCER_TYPE": "Bone Cancer",
-                    "CANCER_TYPE_DETAILED": "Bone cancer detailed",
-                },
-            },
-        ),
-        (
-            {
-                "rCC": {
-                    "CANCER_TYPE": "Renal cancer",
-                    "CANCER_TYPE_DETAILED": "Renal cancer detailed",
-                },
-                "OvArY": {
-                    "CANCER_TYPE": "Ovarian Cancer",
-                    "CANCER_TYPE_DETAILED": "Ovarian cancer detailed",
-                },
-            },
-            {
-                "RENAL": {
-                    "CANCER_TYPE": "Renal cancer",
-                    "CANCER_TYPE_DETAILED": "Renal cancer detailed",
-                },
-                "OVARIAN": {
-                    "CANCER_TYPE": "Ovarian Cancer",
-                    "CANCER_TYPE_DETAILED": "Ovarian cancer detailed",
-                },
-            },
+            "There are invalid values in ONCOTREE_CODE column in the clinical df. They are: ['Renal Cell Carcinoma']",
         ),
     ],
-    ids=[
-        "all_remapped",
-        "no_codes_to_remap",
-        "some_codes_to_remap",
-        "diff_code_casing",
-    ],
+    ids=["all_invalid", "some_invalid"],
 )
-def test_that_map_oncotree_codes_to_cohort_name_returns_expected_remapped_values(
-    input_mapping, output_mapping
+def test_that_check_oncotree_codes_gives_expected_warning_when_invalid_codes(
+    caplog, input_data, oncotree_dict, expected_warning
 ):
-    result = bpc_export.map_oncotree_codes_to_cohort_name(oncotree_dict=input_mapping)
-    assert result == output_mapping
+    with caplog.at_level(logging.WARNING):
+        bpc_export.check_oncotree_codes(df=input_data, oncotree_dict=oncotree_dict)
+    assert expected_warning in caplog.text
+
+
+def test_that_check_oncotree_codes_gives_no_warning_when_all_codes_valid(
+    caplog, input_data, oncotree_dict
+):
+    input_data = (pd.DataFrame(dict(ONCOTREE_CODE=["RCC", "OVARY"])),)
+    oncotree_dict = (
+        {
+            "RCC": {"CANCER_TYPE": "Renal Cell Carcinoma"},
+            "OVARY": {"CANCER_TYPE": "Ovarian Cancer"},
+        },
+    )
+    with caplog.at_level(logging.WARNING):
+        bpc_export.check_oncotree_codes(df=input_data, oncotree_dict=oncotree_dict)
+    assert (
+        "There are invalid values in ONCOTREE_CODE column in the clinical df."
+        not in caplog.text
+    )
