@@ -562,7 +562,7 @@ def _convert_to_int(value):
 
 def check_oncotree_codes(
     df : pd.DataFrame, 
-    oncotree_dict : Dict[Dict[str, str]]
+    oncotree_dict : Dict[str, Dict[str, str]]
     ) -> None:
     """Check that the oncotree codes in input data 
         matches oncotree codes in official oncotree mappings
