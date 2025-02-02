@@ -37,7 +37,7 @@
                 },
                 "production": {
                     "type": "boolean",
-                    "description": "Whether to run in production mode or not. Production mode means uploading to Synapse.",
+                    "description": "Uploads to production project or not (staging project).",
                     "default": false,
                     "enum": [
                         true,
@@ -46,7 +46,7 @@
                 },
                 "use_grs": {
                     "type": "boolean",
-                    "description": "Whether to use grs as primary mapping (dd as secondary) or not (using dd only). ",
+                    "description": "Whether to use grs or use dd as primary mapping.",
                     "default": false,
                     "enum": [
                         true,
