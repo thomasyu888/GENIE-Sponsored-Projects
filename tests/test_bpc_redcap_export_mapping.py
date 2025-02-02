@@ -153,13 +153,11 @@ def test_that_check_oncotree_codes_gives_expected_warning_when_invalid_codes(
 
 
 def test_that_check_oncotree_codes_gives_no_warning_when_all_codes_valid(caplog):
-    input_data = (pd.DataFrame(dict(ONCOTREE_CODE=["RCC", "OVARY"])),)
-    oncotree_dict = (
-        {
-            "RCC": {"CANCER_TYPE": "Renal Cell Carcinoma"},
-            "OVARY": {"CANCER_TYPE": "Ovarian Cancer"},
-        },
-    )
+    input_data = pd.DataFrame(dict(ONCOTREE_CODE=["RCC", "OVARY"]))
+    oncotree_dict = {
+        "RCC": {"CANCER_TYPE": "Renal Cell Carcinoma"},
+        "OVARY": {"CANCER_TYPE": "Ovarian Cancer"},
+    }
     with caplog.at_level(logging.WARNING):
         bpc_export.check_oncotree_codes(df=input_data, oncotree_dict=oncotree_dict)
     assert (
