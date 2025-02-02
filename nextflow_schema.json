@@ -53,6 +53,10 @@
                         false
                     ]
                 },
+                "geniesp_docker":{
+                    "type": "string",
+                    "description": "Name of docker to use for release process in geniesp"
+                },
                 "help": {
                     "type": "boolean",
                     "description": "Display input options and descriptions",

@@ -56,3 +56,35 @@ class Bladder(BpcProjectRunner):
     # Sponsored project name
     _SPONSORED_PROJECT = "BLADDER"
     _exclude_files = ["data_timeline_labtest.txt"]
+    
+    
+class Renal(BpcProjectRunner):
+    """RENAL BPC sponsored project"""
+
+    # Sponsored project name
+    _SPONSORED_PROJECT = "RENAL"
+    _exclude_files = []
+    
+
+class Ovarian(BpcProjectRunner):
+    """OVARIAN BPC sponsored project"""
+
+    # Sponsored project name
+    _SPONSORED_PROJECT = "OVARIAN"
+    _exclude_files = []
+    
+
+class Melanoma(BpcProjectRunner):
+    """MELANOMA BPC sponsored project"""
+
+    # Sponsored project name
+    _SPONSORED_PROJECT = "MELANOMA"
+    _exclude_files = []
+    
+    
+class Esophago(BpcProjectRunner):
+    """ESOPHAGO BPC sponsored project"""
+
+    # Sponsored project name
+    _SPONSORED_PROJECT = "ESOPHAGO"
+    _exclude_files = []

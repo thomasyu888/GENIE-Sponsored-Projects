@@ -5,7 +5,7 @@ nextflow.enable.dsl=2
 Run cBioPortal Export
 */
 process cBioPortalExport {
-   container 'sagebionetworks/geniesp'
+   container "$params.geniesp_docker"
    secret 'SYNAPSE_AUTH_TOKEN'
 
    input:
@@ -56,7 +56,7 @@ workflow {
    params.use_grs = false
 
    // Check if cohort is part of allowed cohort list
-   def allowed_cohorts = ["BLADDER", "BrCa", "CRC", "NSCLC", "PANC", "Prostate"]
+   def allowed_cohorts = ["BLADDER", "BrCa", "CRC", "ESOPHAGO", "MELANOMA", "NSCLC", "OVARIAN", "PANC", "Prostate", "RENAL"]
    if (!allowed_cohorts.contains(params.cohort)) {exit 1, 'Invalid cohort name'}
 
    ch_cohort = Channel.value(params.cohort)
