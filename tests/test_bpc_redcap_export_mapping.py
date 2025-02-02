@@ -131,7 +131,7 @@ def test_that_parse_drug_mappings(input_mapping, var_names, output_mapping):
                 "RCC": {"CANCER_TYPE": "Renal Cell Carcinoma"},
                 "OVARY": {"CANCER_TYPE": "Ovarian Cancer"},
             },
-            "There are invalid values in ONCOTREE_CODE column in the clinical df. They are: ['Renal Cell Carcinoma', 'Renal Clear Cell Carcinoma']",
+            "There are invalid values in ONCOTREE_CODE column in the clinical df: ['Renal Cell Carcinoma', 'Renal Clear Cell Carcinoma']",
         ),
         (
             pd.DataFrame(dict(ONCOTREE_CODE=["Renal Cell Carcinoma", "RCC"])),
@@ -139,7 +139,7 @@ def test_that_parse_drug_mappings(input_mapping, var_names, output_mapping):
                 "RCC": {"CANCER_TYPE": "Renal Cell Carcinoma"},
                 "OVARY": {"CANCER_TYPE": "Ovarian Cancer"},
             },
-            "There are invalid values in ONCOTREE_CODE column in the clinical df. They are: ['Renal Cell Carcinoma']",
+            "There are invalid values in ONCOTREE_CODE column in the clinical df: ['Renal Cell Carcinoma']",
         ),
     ],
     ids=["all_invalid", "some_invalid"],
@@ -165,6 +165,6 @@ def test_that_check_oncotree_codes_gives_no_warning_when_all_codes_valid(
     with caplog.at_level(logging.WARNING):
         bpc_export.check_oncotree_codes(df=input_data, oncotree_dict=oncotree_dict)
     assert (
-        "There are invalid values in ONCOTREE_CODE column in the clinical df."
+        "There are invalid values in ONCOTREE_CODE column in the clinical df"
         not in caplog.text
     )

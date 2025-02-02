@@ -576,9 +576,7 @@ def check_oncotree_codes(
     invalid_codes = list(set(codes_in_df) - set(list(oncotree_dict.keys())))
     if invalid_codes:
         logging.warning(
-            "There are invalid values in ONCOTREE_CODE column in the clinical df." \
-            f"They are: {invalid_codes}."
-            )
+            f"There are invalid values in ONCOTREE_CODE column in the clinical df: {invalid_codes}")
 
 
 class BpcProjectRunner(metaclass=ABCMeta):
