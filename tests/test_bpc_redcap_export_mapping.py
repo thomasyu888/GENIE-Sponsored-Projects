@@ -152,9 +152,7 @@ def test_that_check_oncotree_codes_gives_expected_warning_when_invalid_codes(
     assert expected_warning in caplog.text
 
 
-def test_that_check_oncotree_codes_gives_no_warning_when_all_codes_valid(
-    caplog, input_data, oncotree_dict
-):
+def test_that_check_oncotree_codes_gives_no_warning_when_all_codes_valid(caplog):
     input_data = (pd.DataFrame(dict(ONCOTREE_CODE=["RCC", "OVARY"])),)
     oncotree_dict = (
         {
