@@ -46,7 +46,6 @@ CBIO_FILEFORMATS_ALL = [
     "data_CNA.txt",
 ]
 
-
 def get_file_data(
     syn: Synapse, mappingdf: pd.DataFrame, sampletype: str, cohort: str = "NSCLC"
 ) -> dict:
@@ -559,6 +558,25 @@ def _convert_to_int(value):
         return int(value)
     except ValueError:
         return float('nan')
+
+
+def check_oncotree_codes(
+    df : pd.DataFrame, 
+    oncotree_dict : Dict[str, Dict[str, str]]
+    ) -> None:
+    """Check that the oncotree codes in input data 
+        matches oncotree codes in official oncotree mappings
+        and logs a warning if the oncotree codes don't match and 
+        which ones are not found in the input data.
+    Args:
+        df (pd.DataFrame): input data
+        oncotree_dict (Dict[Dict[str, str]]): official oncotree codes
+    """
+    codes_in_df = df["ONCOTREE_CODE"].unique().tolist()
+    invalid_codes = list(set(codes_in_df) - set(list(oncotree_dict.keys())))
+    if invalid_codes:
+        logging.warning(
+            f"There are invalid values in ONCOTREE_CODE column in the clinical df: {invalid_codes}")
 
 
 class BpcProjectRunner(metaclass=ABCMeta):
@@ -1901,7 +1919,7 @@ class BpcProjectRunner(metaclass=ABCMeta):
         df_sample_subset.drop_duplicates("SAMPLE_ID", inplace=True)
 
         return df_sample_subset
-
+    
     def create_and_write_case_lists(
         self, subset_sampledf: pd.DataFrame, subset_patientdf: pd.DataFrame, used: list
     ) -> None:
@@ -1952,6 +1970,8 @@ class BpcProjectRunner(metaclass=ABCMeta):
             "http://oncotree.mskcc.org/api/tumorTypes/tree?version=oncotree_2018_06_01"
         )
         oncotree_dict = process_functions.get_oncotree_code_mappings(oncotreelink)
+        check_oncotree_codes(df = merged_clinicaldf, oncotree_dict = oncotree_dict)
+        
         # Map cancer type and cancer type detailed
         # This is to create case list files
         merged_clinicaldf["CANCER_TYPE"] = [

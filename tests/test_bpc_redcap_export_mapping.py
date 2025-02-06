@@ -1,3 +1,4 @@
+import logging
 import pytest
 from unittest import mock
 
@@ -5,6 +6,8 @@ import pandas as pd
 import synapseclient
 
 from geniesp import bpc_redcap_export_mapping as bpc_export
+
+LOGGER = logging.getLogger(__name__)
 
 
 @pytest.fixture
@@ -96,7 +99,7 @@ def test_get_mapping_data_calls_dd_if_use_grs_is_false(mock_syn):
                     "Choices, Calculations, OR Slider Labels": [
                         "D001, Aspirin (alternative) | D002, Ibuprofen | D003, Paracetamol"
                     ],
-                    "extra_column" : ["test1"]
+                    "extra_column": ["test1"],
                 }
             ),
             ["drugs_drug_1"],
@@ -113,3 +116,51 @@ def test_get_mapping_data_calls_dd_if_use_grs_is_false(mock_syn):
 def test_that_parse_drug_mappings(input_mapping, var_names, output_mapping):
     result = bpc_export.parse_drug_mappings(mapping=input_mapping, var_names=var_names)
     assert result == output_mapping
+
+
+@pytest.mark.parametrize(
+    "input_data, oncotree_dict, expected_warning",
+    [
+        (
+            pd.DataFrame(
+                dict(
+                    ONCOTREE_CODE=["Renal Cell Carcinoma", "Renal Clear Cell Carcinoma"]
+                )
+            ),
+            {
+                "RCC": {"CANCER_TYPE": "Renal Cell Carcinoma"},
+                "OVARY": {"CANCER_TYPE": "Ovarian Cancer"},
+            },
+            "There are invalid values in ONCOTREE_CODE column in the clinical df: ['Renal Cell Carcinoma', 'Renal Clear Cell Carcinoma']",
+        ),
+        (
+            pd.DataFrame(dict(ONCOTREE_CODE=["Renal Cell Carcinoma", "RCC"])),
+            {
+                "RCC": {"CANCER_TYPE": "Renal Cell Carcinoma"},
+                "OVARY": {"CANCER_TYPE": "Ovarian Cancer"},
+            },
+            "There are invalid values in ONCOTREE_CODE column in the clinical df: ['Renal Cell Carcinoma']",
+        ),
+    ],
+    ids=["all_invalid", "some_invalid"],
+)
+def test_that_check_oncotree_codes_gives_expected_warning_when_invalid_codes(
+    caplog, input_data, oncotree_dict, expected_warning
+):
+    with caplog.at_level(logging.WARNING):
+        bpc_export.check_oncotree_codes(df=input_data, oncotree_dict=oncotree_dict)
+    assert expected_warning in caplog.text
+
+
+def test_that_check_oncotree_codes_gives_no_warning_when_all_codes_valid(caplog):
+    input_data = pd.DataFrame(dict(ONCOTREE_CODE=["RCC", "OVARY"]))
+    oncotree_dict = {
+        "RCC": {"CANCER_TYPE": "Renal Cell Carcinoma"},
+        "OVARY": {"CANCER_TYPE": "Ovarian Cancer"},
+    }
+    with caplog.at_level(logging.WARNING):
+        bpc_export.check_oncotree_codes(df=input_data, oncotree_dict=oncotree_dict)
+    assert (
+        "There are invalid values in ONCOTREE_CODE column in the clinical df"
+        not in caplog.text
+    )
